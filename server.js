@@ -71,7 +71,13 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,  // Gmail App Password
   },
 });
-
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error('SMTP ERROR:', error);
+  } else {
+    console.log('SMTP SERVER READY');
+  }
+});
 /* ── Helper: Validate Email ── */
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
