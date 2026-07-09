@@ -65,11 +65,17 @@ const contactLimiter = rateLimit({
 
 /* ── Nodemailer Transporter ── */
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,  // Gmail App Password
+    pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 });
 transporter.verify(function (error, success) {
   if (error) {
