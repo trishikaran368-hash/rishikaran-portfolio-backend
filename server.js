@@ -10,7 +10,8 @@
 'use strict';
 
 require('dotenv').config();
-
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 const express    = require('express');
 const cors       = require('cors');
 const nodemailer = require('nodemailer');
