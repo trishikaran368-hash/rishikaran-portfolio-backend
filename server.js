@@ -142,74 +142,31 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 
   /* ─ Send Email Notification ─ */
   try {
-    await transporter.sendMail({
-      from:    `"Portfolio Contact Form" <${process.env.EMAIL_USER}>`,
-      to:      process.env.EMAIL_TO,
-      replyTo: sanitized.email,
-      subject: `📩 New Portfolio Message: ${sanitized.subject}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8"/>
-          <style>
-            body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0f1e; color: #e0e0e0; margin: 0; padding: 0; }
-            .container { max-width: 600px; margin: 30px auto; background: #111827; border-radius: 12px; overflow: hidden; border: 1px solid #1e3a5f; }
-            .header { background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%); padding: 24px 32px; }
-            .header h1 { margin: 0; font-size: 22px; color: #fff; }
-            .header p  { margin: 4px 0 0; font-size: 13px; color: rgba(255,255,255,0.8); }
-            .body { padding: 28px 32px; }
-            .field { margin-bottom: 20px; }
-            .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #00d4ff; margin-bottom: 4px; }
-            .value { font-size: 15px; color: #e0e0e0; background: #1a2233; padding: 10px 14px; border-radius: 8px; border-left: 3px solid #00d4ff; }
-            .message-value { white-space: pre-wrap; line-height: 1.6; }
-            .footer { padding: 16px 32px; background: #0d1521; font-size: 12px; color: #667799; text-align: center; border-top: 1px solid #1e3a5f; }
-            .reply-btn { display: inline-block; margin-top: 20px; padding: 10px 24px; background: linear-gradient(135deg, #00d4ff, #0066ff); color: #fff; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>⚙️ New Contact Message</h1>
-              <p>From your portfolio — rishikarant-portfolio.vercel.app</p>
-            </div>
-            <div class="body">
-              <div class="field">
-                <div class="label">From</div>
-                <div class="value">${sanitized.name}</div>
-              </div>
-              <div class="field">
-                <div class="label">Email</div>
-                <div class="value">${sanitized.email}</div>
-              </div>
-              <div class="field">
-                <div class="label">Subject</div>
-                <div class="value">${sanitized.subject}</div>
-              </div>
-              <div class="field">
-                <div class="label">Message</div>
-                <div class="value message-value">${sanitized.message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-              </div>
-              <a class="reply-btn" href="mailto:${sanitized.email}?subject=Re: ${encodeURIComponent(sanitized.subject)}">
-                Reply to ${sanitized.name}
-              </a>
-            </div>
-            <div class="footer">
-              Received on ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
-    });
-    console.log(`[EMAIL] Notification sent for message from ${sanitized.email}`);
-  } catch (emailErr) {
-    console.error('[EMAIL] Send error:', emailErr.message);
-    return res.status(500).json({
-      success: false,
-      error: 'Message saved but email notification failed. Check EMAIL_USER and EMAIL_PASS in your .env file.',
-    });
-  }
+  await resend.emails.send({
+  from: "Portfolio Contact <onboarding@resend.dev>",
+  to: process.env.EMAIL_TO,
+  replyTo: sanitized.email,
+  subject: `📩 New Portfolio Message: ${sanitized.subject}`,
+  html: `
+    <h2>New Portfolio Contact</h2>
+
+    <p><strong>Name:</strong> ${sanitized.name}</p>
+    <p><strong>Email:</strong> ${sanitized.email}</p>
+    <p><strong>Subject:</strong> ${sanitized.subject}</p>
+    <p><strong>Message:</strong></p>
+    <p>${sanitized.message}</p>
+  `,
+});
+
+console.log(`[EMAIL] Notification sent for message from ${sanitized.email}`);
+} catch (emailErr) {
+  console.error("[EMAIL] Send error:", emailErr);
+
+  return res.status(500).json({
+    success: false,
+    error: "Message saved but email notification failed.",
+  });
+}
 
   res.status(200).json({
     success: true,
