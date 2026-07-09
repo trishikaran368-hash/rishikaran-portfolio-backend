@@ -21,6 +21,7 @@ const FileSync   = require('lowdb/adapters/FileSync');
 
 /* ── Express App ── */
 const app  = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3001;
 
 /* ── JSON File Database (lowdb) ── */
